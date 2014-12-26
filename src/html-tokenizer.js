@@ -5,12 +5,17 @@ var Tokenizer = require('./tokenizer');
 
 var noneToTagOpen = {
   test: /^</,
-  value: /^<([^\s]+)/
+  value: /^<([^\s>]+)/
+};
+
+var tagOpenToTagOpen = {
+  test: /^></,
+  value: /^><([^\s>]+)/
 };
 
 var tagOpenToAttributeName = {
   test: /^\s+/,
-  value: /^\s+([a-z\-]+)/
+  value: /^\s+([a-z\-:\.]+)/
 };
 
 var attributeNameToSingleQuotedAttributeValue = {
@@ -40,6 +45,8 @@ var textToTagClose = {
   value: /^<\/([^>]+)>/
 };
 
+var tagCloseToTagClose = textToTagClose;
+
 var tagCloseToTag = {
   test: /^<[^>]+\/>/,
   value: /^<([^>]+)\/>/
@@ -47,11 +54,18 @@ var tagCloseToTag = {
 
 var attributeValueToText = attributeNameToText;
 
+var tagOpenToText = {
+  test: /^>[^<]/,
+  value: /^>([^<]+)/
+};
+
 function HTMLTokenizer () {
   Tokenizer.apply(this, arguments);
 
   this.addTransition('none', 'tag open', noneToTagOpen);
   this.addTransition('tag open', 'attribute name', tagOpenToAttributeName);
+  this.addTransition('tag open', 'tag open', tagOpenToTagOpen);
+  this.addTransition('tag open', 'text', tagOpenToText);
   this.addTransition('attribute name', 'attribute value', attributeNameToSingleQuotedAttributeValue);
   this.addTransition('attribute name', 'attribute value', attributeNameToDoubleQuotedAttributeValue);
   // Unquoted attributes are hardest, so check them last
@@ -61,6 +75,7 @@ function HTMLTokenizer () {
   this.addTransition('attribute value', 'text', attributeValueToText);
   this.addTransition('text', 'tag close', textToTagClose);
   this.addTransition('tag close', 'tag', tagCloseToTag);
+  this.addTransition('tag close', 'tag close', tagCloseToTagClose);
 }
 
 HTMLTokenizer.prototype = Tokenizer.prototype;
