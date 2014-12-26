@@ -20,6 +20,7 @@ function Tokenizer () {
 Tokenizer.prototype = {
   resetState: function () {
     this.state = 'none';
+    this.lastToken = null;
   },
 
   addTransition: function (from, to, transition) {
@@ -55,10 +56,14 @@ Tokenizer.prototype = {
     this.state = transition.state;
     this.str = this.str.substring(match[0].length);
 
-    return {
+    var token = {
       type: transition.state,
       value: match[1]
     };
+
+    this.lastToken = token;
+
+    return token;
   },
 
   process: function (str) {
