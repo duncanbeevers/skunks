@@ -44,7 +44,11 @@ var attributeNameToUnquotedAttributeValue = {
   value: /^=([^>\s]+)/
 };
 
-var attributeValueToAttributeName = tagOpenToAttributeName;
+var attributeValueToAttributeName = {
+  test: /^\s*[^>]/,
+  token: 'attribute name',
+  value: /^\s*([a-z\-:\.]+)/
+};
 
 var attributeNameToText = {
   test: /^>/,

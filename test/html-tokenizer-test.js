@@ -137,4 +137,14 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'script' }
   ]);
 
+  writeParseTest('<a title="x"href=" ">foo</a>', [
+    { type: 'tag open', value: 'a' },
+    { type: 'attribute name', value: 'title' },
+    { type: 'attribute value', value: 'x' },
+    { type: 'attribute name', value: 'href' },
+    { type: 'attribute value', value: ' ' },
+    { type: 'text', value: 'foo' },
+    { type: 'tag close', value: 'a' }
+  ]);
+
 });
