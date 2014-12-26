@@ -2,6 +2,16 @@
 
 var _ = require('lodash');
 
+function validateTransition (transition) {
+  if (!transition.test || transition.test.toString().substring(0, 2) !== '/^') {
+    throw new Error('Transition must provide a `test` regular expression beginning with a start-of-line anchor `^`');
+  }
+
+  if (!transition.value || transition.value.toString().substring(0, 2) !== '/^') {
+    throw new Error('Transition must provide a `value` regular expression beginning with a start-of-line anchor `^`');
+  }
+}
+
 function Tokenizer () {
   this.transitions = {};
   this.resetState();
@@ -13,6 +23,7 @@ Tokenizer.prototype = {
   },
 
   addTransition: function (from, to, transition) {
+    validateTransition(transition);
     var transitions = this.transitions[from];
     if (!transitions) {
       transitions = [];
@@ -37,6 +48,10 @@ Tokenizer.prototype = {
     }
 
     var match = this.str.match(transition.value);
+    if (!match) {
+      throw new Error('Transition from `' + this.state + '` to `' + transition.state + '` failed to match ' + transition.value.toString() + ' against ' + JSON.stringify(this.str));
+    }
+
     this.state = transition.state;
     this.str = this.str.substring(match[0].length);
 

@@ -67,13 +67,14 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
-  // writeParseTest('<p foo-bar=baz>xxx</p>', [
-  //   { type: 'tag open', value: 'p' },
-  //   { type: 'attribute name', value: 'foo-bar' },
-  //   { type: 'attribute value', value: 'baz' },
-  //   { type: 'text', value: 'xxx' },
-  //   { type: 'tag close', value: 'p' }
-  // ]); //, '<p foo-bar="baz">xxx</p>');
+  writeParseTest('<p foo-bar=baz>xxx</p>', [
+    { type: 'tag open', value: 'p' },
+    { type: 'attribute name', value: 'foo-bar' },
+    { type: 'attribute value', value: 'baz' },
+    { type: 'text', value: 'xxx' },
+    { type: 'tag close', value: 'p' }
+  ]); //, '<p foo-bar="baz">xxx</p>');
+
   // writeParseTest('<p foo:bar=baz>xxx</p>',
   // [ { type: 'tag open', value: 'p' }
   // ]); // , '<p foo:bar="baz">xxx</p>');

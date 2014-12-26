@@ -13,9 +13,19 @@ var tagOpenToAttributeName = {
   value: /^\s+([a-z\-]+)/
 };
 
-var attributeNameToAttributeValue = {
-  test: /^=/,
+var attributeNameToSingleQuotedAttributeValue = {
+  test: /^='/,
+  value: /^='([^']+)'/
+};
+
+var attributeNameToDoubleQuotedAttributeValue = {
+  test: /^="/,
   value: /^="([^"]+)"/
+};
+
+var attributeNameToUnquotedAttributeValue = {
+  test: /^=/,
+  value: /^=([^>\s]+)/
 };
 
 var attributeValueToAttributeName = tagOpenToAttributeName;
@@ -42,7 +52,10 @@ function HTMLTokenizer () {
 
   this.addTransition('none', 'tag open', noneToTagOpen);
   this.addTransition('tag open', 'attribute name', tagOpenToAttributeName);
-  this.addTransition('attribute name', 'attribute value', attributeNameToAttributeValue);
+  this.addTransition('attribute name', 'attribute value', attributeNameToSingleQuotedAttributeValue);
+  this.addTransition('attribute name', 'attribute value', attributeNameToDoubleQuotedAttributeValue);
+  // Unquoted attributes are hardest, so check them last
+  this.addTransition('attribute name', 'attribute value', attributeNameToUnquotedAttributeValue);
   this.addTransition('attribute name', 'text', attributeNameToText);
   this.addTransition('attribute value', 'attribute name', attributeValueToAttributeName);
   this.addTransition('attribute value', 'text', attributeValueToText);
