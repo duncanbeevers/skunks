@@ -166,4 +166,14 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
+  writeParseTest('<a href="#"><p>Click me</p></a>', [
+    { type: 'tag open', value: 'a' },
+    { type: 'attribute name', value: 'href' },
+    { type: 'attribute value', value: '#' },
+    { type: 'tag open', value: 'p' },
+    { type: 'text', value: 'Click me' },
+    { type: 'tag close', value: 'p' },
+    { type: 'tag close', value: 'a' }
+  ]);
+
 });

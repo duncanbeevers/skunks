@@ -50,6 +50,12 @@ var attributeValueToAttributeName = {
   value: /^\s*([a-z\-:\.]+)/
 };
 
+var attributeValueToTagOpen = {
+  test: /^\s*></,
+  token: 'tag open',
+  value: /^\s*><([^\s>]+)/
+};
+
 var attributeNameToText = {
   test: /^>/,
   token: 'text',
@@ -108,8 +114,10 @@ function HTMLTokenizer () {
   this.addTransition('attribute name', 'attribute value', attributeNameToUnquotedAttributeValue);
   this.addTransition('attribute name', 'text', attributeNameToText);
 
+  this.addTransition('attribute value', 'tag open', attributeValueToTagOpen);
   this.addTransition('attribute value', 'attribute name', attributeValueToAttributeName);
   this.addTransition('attribute value', 'text', attributeValueToText);
+
   this.addTransition('text', 'tag close', textToTagClose);
 
   this.addTransition('tag close', 'tag', tagCloseToTag);
