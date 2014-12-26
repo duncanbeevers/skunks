@@ -196,4 +196,11 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'object' }
   ]);
 
+  writeParseTest('<ng-include src="x"></ng-include>', [
+    { type: 'tag open', value: 'ng-include' },
+    { type: 'attribute name', value: 'src' },
+    { type: 'attribute value', value: 'x' },
+    { type: 'tag close', value: 'ng-include' }
+  ]);
+
 });
