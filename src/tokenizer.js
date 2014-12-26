@@ -40,11 +40,13 @@ var tagCloseToTag = {
   value: /^<([^>]+)\/>/
 };
 
+var attributeValueToText = attributeNameToText;
+
 var states = {
   'none': [noneToTagOpen],
   'tag open': [tagOpenToAttributeName],
   'attribute name': [attributeNameToAttributeValue, attributeNameToText],
-  'attribute value': [attributeValueToAttributeName],
+  'attribute value': [attributeValueToAttributeName, attributeValueToText],
   'text': [textToTagClose],
   'tag close': [tagCloseToTag]
 };
