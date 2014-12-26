@@ -2,67 +2,33 @@
 
 var _ = require('lodash');
 
-var noneToTagOpen = {
-  test: /^</,
-  state: 'tag open',
-  value: /^<([^\s]+)/
-};
-
-var tagOpenToAttributeName = {
-  test: /^\s+/,
-  state: 'attribute name',
-  value: /^\s+([a-z]+)/
-};
-
-var attributeNameToAttributeValue = {
-  test: /^=/,
-  state: 'attribute value',
-  value: /^="([^"]+)"/
-};
-
-var attributeValueToAttributeName = tagOpenToAttributeName;
-
-var attributeNameToText = {
-  test: /^>/,
-  state: 'text',
-  value: /^>([^<]+)/
-};
-
-var textToTagClose = {
-  test: /^<\//,
-  state: 'tag close',
-  value: /^<\/([^>]+)>/
-};
-
-var tagCloseToTag = {
-  test: /^<[^>]+\/>/,
-  state: 'tag',
-  value: /^<([^>]+)\/>/
-};
-
-var attributeValueToText = attributeNameToText;
-
-var states = {
-  'none': [noneToTagOpen],
-  'tag open': [tagOpenToAttributeName],
-  'attribute name': [attributeNameToAttributeValue, attributeNameToText],
-  'attribute value': [attributeValueToAttributeName, attributeValueToText],
-  'text': [textToTagClose],
-  'tag close': [tagCloseToTag]
-};
-
-function Tokenizer (str) {
-  this.str = str;
-  this.state = 'none';
+function Tokenizer () {
+  this.transitions = {};
+  this.resetState();
 }
 
 Tokenizer.prototype = {
+  resetState: function () {
+    this.state = 'none';
+  },
+
+  addTransition: function (from, to, transition) {
+    var transitions = this.transitions[from];
+    if (!transitions) {
+      transitions = [];
+      this.transitions[from] = transitions;
+    }
+
+    transitions.push(_.extend({ state: to }, transition));
+  },
+
   nextToken: function () {
     if (this.str === '') {
+      this.resetState();
       return null;
     }
 
-    var transition = _.find(states[this.state], function (transition) {
+    var transition = _.find(this.transitions[this.state], function (transition) {
       return transition.test.test(this.str);
     }, this);
 
@@ -78,23 +44,24 @@ Tokenizer.prototype = {
       type: transition.state,
       value: match[1]
     };
-  }
-};
+  },
 
-function process (str) {
-  var tokenizer = new Tokenizer(str);
-  var tokens = [];
-  while (true) {
-    var token = tokenizer.nextToken();
-    if (!token) {
-      break;
+  process: function (str) {
+    this.resetState();
+    this.str = str;
+
+    var tokens = [];
+    while (true) {
+      var token = this.nextToken();
+      if (!token) {
+        break;
+      }
+
+      tokens.push(token);
     }
+    return tokens;
 
-    tokens.push(token);
   }
-  return tokens;
-}
-
-module.exports = {
-  process: process
 };
+
+module.exports = Tokenizer;
