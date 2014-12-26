@@ -29,13 +29,13 @@ var tagOpenToAttributeName = {
 var attributeNameToSingleQuotedAttributeValue = {
   test: /^='/,
   token: 'attribute value',
-  value: /^='([^']+)'/
+  value: /^='([^']*)'/
 };
 
 var attributeNameToDoubleQuotedAttributeValue = {
   test: /^="/,
   token: 'attribute value',
-  value: /^="([^"]+)"/
+  value: /^="([^"]*)"/
 };
 
 var attributeNameToUnquotedAttributeValue = {

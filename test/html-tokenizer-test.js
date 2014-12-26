@@ -147,4 +147,15 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'a' }
   ]);
 
+  writeParseTest('<p id=""class=""title="">x', [
+    { type: 'tag open', value: 'p' },
+    { type: 'attribute name', value: 'id' },
+    { type: 'attribute value', value: '' },
+    { type: 'attribute name', value: 'class' },
+    { type: 'attribute value', value: '' },
+    { type: 'attribute name', value: 'title' },
+    { type: 'attribute value', value: '' },
+    { type: 'text', value: 'x' }
+  ]);
+
 });
