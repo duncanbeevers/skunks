@@ -176,4 +176,24 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'a' }
   ]);
 
+  writeParseTest('<span><button>Hit me</button></span>', [
+    { type: 'tag open', value: 'span' },
+    { type: 'tag open', value: 'button' },
+    { type: 'text', value: 'Hit me' },
+    { type: 'tag close', value: 'button' },
+    { type: 'tag close', value: 'span' }
+  ]);
+
+  writeParseTest('<object type="image/svg+xml" data="image.svg"><div>[fallback image]</div></object>', [
+    { type: 'tag open', value: 'object' },
+    { type: 'attribute name', value: 'type' },
+    { type: 'attribute value', value: 'image/svg+xml' },
+    { type: 'attribute name', value: 'data' },
+    { type: 'attribute value', value: 'image.svg' },
+    { type: 'tag open', value: 'div' },
+    { type: 'text', value: '[fallback image]' },
+    { type: 'tag close', value: 'div' },
+    { type: 'tag close', value: 'object' }
+  ]);
+
 });
