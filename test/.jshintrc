@@ -1,0 +1,14 @@
+{
+    "node": true,
+    // Custom Globals
+    "globals"       : {
+        "module": true,
+        "describe": true,
+        "beforeEach": true,
+        "afterEach": true,
+        "before": true,
+        "after": true,
+        "it": true,
+        "expect": true
+    }
+}
