@@ -158,4 +158,12 @@ describe('HTMLTokenizer', function () {
     { type: 'text', value: 'x' }
   ]);
 
+  writeParseTest('<p x="x\'"">x</p>', [
+    { type: 'tag open', value: 'p' },
+    { type: 'attribute name', value: 'x' },
+    { type: 'attribute value', value: 'x\'' },
+    { type: 'text', value: 'x' },
+    { type: 'tag close', value: 'p' }
+  ]);
+
 });
