@@ -31,7 +31,7 @@ Tokenizer.prototype = {
       this.transitions[from] = transitions;
     }
 
-    transitions.push(_.extend({ state: to }, transition));
+    transitions.unshift(transition);
   },
 
   nextToken: function () {
@@ -45,7 +45,7 @@ Tokenizer.prototype = {
     }, this);
 
     if (!transition) {
-      throw new Error('No valid transition found from `' + this.state + '` for ' + JSON.stringify(this.str));
+      throw new Error('No transition found from `' + this.state + '` for ' + JSON.stringify(this.str));
     }
 
     var match = this.str.match(transition.value);

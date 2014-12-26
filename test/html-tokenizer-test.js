@@ -1,40 +1,14 @@
 'use strict';
 
 var HTMLTokenizer = require('../src/html-tokenizer');
-var _ = require('lodash');
-var expect = require('expect.js');
-
-
-function writeParseTest (markup, expectedTokens) {
-  describe('processing ' + JSON.stringify(markup), (function (markup, expectedTokens) {
-    return function () {
-      before(function () {
-        var tokenizer = new HTMLTokenizer();
-        var tokens = tokenizer.process(markup);
-        this.tokens = tokens;
-      });
-
-      it('should produce ' + expectedTokens.length + ' tokens', function () {
-        expect(this.tokens.length).to.equal(expectedTokens.length);
-      });
-
-      _.each(expectedTokens, function (expectedToken, i) {
-        it('should produce token ' + i + ' ' + JSON.stringify(expectedToken), (function () {
-          return function () {
-            var expectedToken = expectedTokens[i];
-            var token = this.tokens[i];
-
-            expect(token.type).to.equal(expectedToken.type);
-            expect(token.value).to.equal(expectedToken.value);
-          };
-        }(i)));
-      });
-    };
-  }(markup, expectedTokens)));
-}
+var writeTokenizationTest = require('./write-tokenization-test');
 
 describe('HTMLTokenizer', function () {
-  writeParseTest('<a href="#" disabled>Click</a><br/>', [
+  before(function () {
+    this.tokenizer = new HTMLTokenizer();
+  });
+
+  writeTokenizationTest('<a href="#" disabled>Click</a><br/>', [
     { type: 'tag open', value: 'a' },
     { type: 'attribute name', value: 'href' },
     { type: 'attribute value', value: '#' },
@@ -44,7 +18,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag', value: 'br' }
   ]);
 
-  writeParseTest('<p title="</p>">x</p>', [
+  writeTokenizationTest('<p title="</p>">x</p>', [
     { type: 'tag open', value: 'p' },
     { type: 'attribute name', value: 'title' },
     { type: 'attribute value', value: '</p>' },
@@ -52,7 +26,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
-  writeParseTest('<p title=" <!-- hello world --> ">x</p>', [
+  writeTokenizationTest('<p title=" <!-- hello world --> ">x</p>', [
     { type: 'tag open', value: 'p' },
     { type: 'attribute name', value: 'title' },
     { type: 'attribute value', value: ' <!-- hello world --> ' },
@@ -60,7 +34,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
-  writeParseTest('<p title=" <![CDATA[ \n\n foobar baz ]]> ">x</p>', [
+  writeTokenizationTest('<p title=" <![CDATA[ \n\n foobar baz ]]> ">x</p>', [
     { type: 'tag open', value: 'p' },
     { type: 'attribute name', value: 'title' },
     { type: 'attribute value', value: ' <![CDATA[ \n\n foobar baz ]]> ' },
@@ -68,7 +42,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
-  writeParseTest('<p foo-bar=baz>xxx</p>', [
+  writeTokenizationTest('<p foo-bar=baz>xxx</p>', [
     { type: 'tag open', value: 'p' },
     { type: 'attribute name', value: 'foo-bar' },
     { type: 'attribute value', value: 'baz' },
@@ -76,7 +50,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
-  writeParseTest('<p foo:bar=baz>xxx</p>', [
+  writeTokenizationTest('<p foo:bar=baz>xxx</p>', [
     { type: 'tag open', value: 'p' },
     { type: 'attribute name', value: 'foo:bar' },
     { type: 'attribute value', value: 'baz' },
@@ -84,7 +58,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
-  writeParseTest('<p foo.bar=baz>xxx</p>', [
+  writeTokenizationTest('<p foo.bar=baz>xxx</p>', [
     { type: 'tag open', value: 'p' },
     { type: 'attribute name', value: 'foo.bar' },
     { type: 'attribute value', value: 'baz' },
@@ -92,7 +66,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
-  writeParseTest('<div><div><div><div><div><div><div><div><div><div>' +
+  writeTokenizationTest('<div><div><div><div><div><div><div><div><div><div>' +
     'i\'m 10 levels deep' +
     '</div></div></div></div></div></div></div></div></div></div>', [
     { type: 'tag open', value: 'div' },
@@ -118,26 +92,26 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'div' }
   ]);
 
-  writeParseTest('<script>alert(\'<!--\')</script>', [
+  writeTokenizationTest('<script>alert(\'<!--\')</script>', [
     { type: 'tag open', value: 'script' },
     { type: 'text', value: 'alert(\'<!--\')' },
     { type: 'tag close', value: 'script' }
   ]);
 
-  writeParseTest('<script>alert(\'<!-- foo -->\')<\/script>', [
+  writeTokenizationTest('<script>alert(\'<!-- foo -->\')<\/script>', [
     { type: 'tag open', value: 'script' },
     { type: 'text', value: 'alert(\'<!-- foo -->\')' },
     { type: 'tag close', value: 'script' }
   ]);
 
 
-  writeParseTest('<script>alert(\'-->\')<\/script>', [
+  writeTokenizationTest('<script>alert(\'-->\')<\/script>', [
     { type: 'tag open', value: 'script' },
     { type: 'text', value: 'alert(\'-->\')' },
     { type: 'tag close', value: 'script' }
   ]);
 
-  writeParseTest('<a title="x"href=" ">foo</a>', [
+  writeTokenizationTest('<a title="x"href=" ">foo</a>', [
     { type: 'tag open', value: 'a' },
     { type: 'attribute name', value: 'title' },
     { type: 'attribute value', value: 'x' },
@@ -147,7 +121,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'a' }
   ]);
 
-  writeParseTest('<p id=""class=""title="">x', [
+  writeTokenizationTest('<p id=""class=""title="">x', [
     { type: 'tag open', value: 'p' },
     { type: 'attribute name', value: 'id' },
     { type: 'attribute value', value: '' },
@@ -158,7 +132,7 @@ describe('HTMLTokenizer', function () {
     { type: 'text', value: 'x' }
   ]);
 
-  writeParseTest('<p x="x\'"">x</p>', [
+  writeTokenizationTest('<p x="x\'"">x</p>', [
     { type: 'tag open', value: 'p' },
     { type: 'attribute name', value: 'x' },
     { type: 'attribute value', value: 'x\'' },
@@ -166,7 +140,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'p' }
   ]);
 
-  writeParseTest('<a href="#"><p>Click me</p></a>', [
+  writeTokenizationTest('<a href="#"><p>Click me</p></a>', [
     { type: 'tag open', value: 'a' },
     { type: 'attribute name', value: 'href' },
     { type: 'attribute value', value: '#' },
@@ -176,7 +150,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'a' }
   ]);
 
-  writeParseTest('<span><button>Hit me</button></span>', [
+  writeTokenizationTest('<span><button>Hit me</button></span>', [
     { type: 'tag open', value: 'span' },
     { type: 'tag open', value: 'button' },
     { type: 'text', value: 'Hit me' },
@@ -184,7 +158,7 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'span' }
   ]);
 
-  writeParseTest('<object type="image/svg+xml" data="image.svg"><div>[fallback image]</div></object>', [
+  writeTokenizationTest('<object type="image/svg+xml" data="image.svg"><div>[fallback image]</div></object>', [
     { type: 'tag open', value: 'object' },
     { type: 'attribute name', value: 'type' },
     { type: 'attribute value', value: 'image/svg+xml' },
@@ -196,11 +170,17 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'object' }
   ]);
 
-  writeParseTest('<ng-include src="x"></ng-include>', [
+  writeTokenizationTest('<ng-include src="x"></ng-include>', [
     { type: 'tag open', value: 'ng-include' },
     { type: 'attribute name', value: 'src' },
     { type: 'attribute value', value: 'x' },
     { type: 'tag close', value: 'ng-include' }
   ]);
+
+  // writeTokenizationTest('<ng:include src="x"></ng:include>', [
+  // ]);
+    // equal(minify('<ng-include src="\'views/partial-notification.html\'"></ng-include><div ng-view=""></div>'),
+    //   '<ng-include src="\'views/partial-notification.html\'"></ng-include><div ng-view=""></div>'
+    // );
 
 });

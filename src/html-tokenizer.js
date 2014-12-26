@@ -105,30 +105,30 @@ var scriptTagOpenToText = {
 function HTMLTokenizer () {
   Tokenizer.apply(this, arguments);
 
-  this.addTransition('none', 'script tag open', noneToScriptTagOpen);
   this.addTransition('none', 'tag open', noneToTagOpen);
+  this.addTransition('none', 'script tag open', noneToScriptTagOpen);
 
-  this.addTransition('script tag open', 'script tag close', scriptTagOpenToScriptTagClose);
   this.addTransition('script tag open', 'text', scriptTagOpenToText);
+  this.addTransition('script tag open', 'script tag close', scriptTagOpenToScriptTagClose);
 
-  this.addTransition('tag open', 'attribute name', tagOpenToAttributeName);
-  this.addTransition('tag open', 'tag open', tagOpenToTagOpen);
   this.addTransition('tag open', 'text', tagOpenToText);
+  this.addTransition('tag open', 'tag open', tagOpenToTagOpen);
+  this.addTransition('tag open', 'attribute name', tagOpenToAttributeName);
 
-  this.addTransition('attribute name', 'attribute value', attributeNameToSingleQuotedAttributeValue);
-  this.addTransition('attribute name', 'attribute value', attributeNameToDoubleQuotedAttributeValue);
-  this.addTransition('attribute name', 'attribute value', attributeNameToUnquotedAttributeValue);
   this.addTransition('attribute name', 'text', attributeNameToText);
+  this.addTransition('attribute name', 'attribute value', attributeNameToUnquotedAttributeValue);
+  this.addTransition('attribute name', 'attribute value', attributeNameToDoubleQuotedAttributeValue);
+  this.addTransition('attribute name', 'attribute value', attributeNameToSingleQuotedAttributeValue);
 
-  this.addTransition('attribute value', 'tag close', attributeValueToTagClose);
-  this.addTransition('attribute value', 'tag open', attributeValueToTagOpen);
-  this.addTransition('attribute value', 'attribute name', attributeValueToAttributeName);
   this.addTransition('attribute value', 'text', attributeValueToText);
+  this.addTransition('attribute value', 'attribute name', attributeValueToAttributeName);
+  this.addTransition('attribute value', 'tag open', attributeValueToTagOpen);
+  this.addTransition('attribute value', 'tag close', attributeValueToTagClose);
 
   this.addTransition('text', 'tag close', textToTagClose);
 
-  this.addTransition('tag close', 'tag', tagCloseToTag);
   this.addTransition('tag close', 'tag close', tagCloseToTagClose);
+  this.addTransition('tag close', 'tag', tagCloseToTag);
 }
 
 HTMLTokenizer.prototype = Tokenizer.prototype;
