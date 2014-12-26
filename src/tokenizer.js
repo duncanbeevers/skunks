@@ -54,10 +54,11 @@ Tokenizer.prototype = {
     }
 
     this.state = transition.state;
-    this.str = this.str.substring(match[0].length);
+    var trim = match[0].length - ((match[2] && match[2].length) || 0);
+    this.str = this.str.substring(trim);
 
     var token = {
-      type: transition.state,
+      type: transition.token,
       value: match[1]
     };
 

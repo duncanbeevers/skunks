@@ -118,4 +118,23 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'div' }
   ]);
 
+  writeParseTest('<script>alert(\'<!--\')</script>', [
+    { type: 'tag open', value: 'script' },
+    { type: 'text', value: 'alert(\'<!--\')' },
+    { type: 'tag close', value: 'script' }
+  ]);
+
+  writeParseTest('<script>alert(\'<!-- foo -->\')<\/script>', [
+    { type: 'tag open', value: 'script' },
+    { type: 'text', value: 'alert(\'<!-- foo -->\')' },
+    { type: 'tag close', value: 'script' }
+  ]);
+
+
+  writeParseTest('<script>alert(\'-->\')<\/script>', [
+    { type: 'tag open', value: 'script' },
+    { type: 'text', value: 'alert(\'-->\')' },
+    { type: 'tag close', value: 'script' }
+  ]);
+
 });
