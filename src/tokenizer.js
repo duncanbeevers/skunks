@@ -1,5 +1,7 @@
 'use strict';
 
+// Transform string of markup into array of tokens
+
 var _ = require('lodash');
 
 function validateTransition (transition) {
