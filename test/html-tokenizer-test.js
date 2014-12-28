@@ -8,6 +8,20 @@ describe('HTMLTokenizer', function () {
     this.tokenizer = new HTMLTokenizer();
   });
 
+  writeTokenizationTest('<p>', [
+    { type: 'tag open', value: 'p' }
+  ]);
+
+  writeTokenizationTest('<p _>', [
+    { type: 'tag open', value: 'p' },
+    { type: 'attribute name', value: '_' }
+  ]);
+
+  writeTokenizationTest('<p :>', [
+    { type: 'tag open', value: 'p' },
+    { type: 'attribute name', value: ':' }
+  ]);
+
   writeTokenizationTest('<a href="#" disabled>Click</a><br/>', [
     { type: 'tag open', value: 'a' },
     { type: 'attribute name', value: 'href' },
@@ -168,13 +182,6 @@ describe('HTMLTokenizer', function () {
     { type: 'text', value: '[fallback image]' },
     { type: 'tag close', value: 'div' },
     { type: 'tag close', value: 'object' }
-  ]);
-
-  writeTokenizationTest('<ng-include src="x"></ng-include>', [
-    { type: 'tag open', value: 'ng-include' },
-    { type: 'attribute name', value: 'src' },
-    { type: 'attribute value', value: 'x' },
-    { type: 'tag close', value: 'ng-include' }
   ]);
 
   // writeTokenizationTest('<ng:include src="x"></ng:include>', [

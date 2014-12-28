@@ -3,8 +3,12 @@
 var _ = require('lodash');
 
 function validateTransition (transition) {
-  if (!transition.test || transition.test.toString().substring(0, 2) !== '/^') {
-    throw new Error('Transition must provide a `test` regular expression beginning with a start-of-line anchor `^`');
+  if (!transition) {
+    throw new Error('Transition must be an object providing a `state` string and a `value` regular expression');
+  }
+
+  if (!transition.state) {
+    throw new Error('Transition must provide a `state` string to which the tokenizer should transition after matching its `value`');
   }
 
   if (!transition.value || transition.value.toString().substring(0, 2) !== '/^') {
@@ -41,7 +45,10 @@ Tokenizer.prototype = {
     }
 
     var transition = _.find(this.transitions[this.state], function (transition) {
-      return transition.test.test(this.str);
+      var lastStemMatches = !transition.not || !this.lastStem ||
+        transition.not.test(this.lastStem);
+
+      return lastStemMatches && transition.value.test(this.str);
     }, this);
 
     if (!transition) {
@@ -53,8 +60,14 @@ Tokenizer.prototype = {
       throw new Error('Transition from `' + this.state + '` to `' + transition.state + '` failed to match ' + transition.value.toString() + ' against ' + JSON.stringify(this.str));
     }
 
-    this.state = transition.state;
     var trim = match[0].length - ((match[2] && match[2].length) || 0);
+    this.lastStem = this.str.substring(0, trim);
+
+    // console.log('\nTransition: `' + this.state + '` ➡ `' + transition.state + '`');
+    // console.log('  ' + JSON.stringify(this.str) + ' matches ' + transition.value.toString() + ' ' + JSON.stringify(match));
+    // console.log('  ' + Array(JSON.stringify(this.lastStem).length).join(' ') + '↑');
+
+    this.state = transition.state;
     this.str = this.str.substring(trim);
 
     var token = {
