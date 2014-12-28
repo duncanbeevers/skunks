@@ -1,84 +1,88 @@
 'use strict';
 
+var _ = require('lodash');
 var Tokenizer = require('./tokenizer');
 
 var noneToScriptTagOpen = {
   test: /^<script/,
   token: 'tag open',
+  state: 'script tag open',
   value: /^<(script)/
 };
 
 var noneToTagOpen = {
   test: /^</,
-  token: 'tag open',
+  state: 'tag open',
   value: /^<([^\s>]+)/
 };
 
 var tagOpenToTagOpen = {
   test: /^></,
-  token: 'tag open',
+  state: 'tag open',
   value: /^><([^\s>]+)/
 };
 
 var tagOpenToAttributeName = {
   test: /^\s+/,
-  token: 'attribute name',
+  state: 'attribute name',
   value: /^\s+([a-z\-:\.]+)/
 };
 
 var attributeNameToSingleQuotedAttributeValue = {
   test: /^='/,
-  token: 'attribute value',
+  state: 'attribute value',
   value: /^='([^']*)'+/
 };
 
 var attributeNameToDoubleQuotedAttributeValue = {
   test: /^="/,
-  token: 'attribute value',
+  state: 'attribute value',
   value: /^="([^"]*)"+/
 };
 
 var attributeNameToUnquotedAttributeValue = {
   test: /^=/,
-  token: 'attribute value',
+  state: 'attribute value',
   value: /^=([^>\s]+)/
 };
 
 var attributeValueToAttributeName = {
   test: /^\s*[^>]/,
-  token: 'attribute name',
+  state: 'attribute name',
   value: /^\s*([a-z\-:\.]+)/
 };
 
 var attributeValueToTagClose = {
   test: /^\s*><\//,
-  token: 'tag close',
+  state: 'tag close',
   value: /^\s*><\/([^\s>]+)\s*>/
 };
 
 var attributeValueToTagOpen = {
   test: /^\s*></,
-  token: 'tag open',
+  state: 'tag open',
   value: /^\s*><([^\s>]+)/
 };
 
 var attributeNameToText = {
   test: /^>/,
-  token: 'text',
+  state: 'text',
   value: /^>([^<]+)/
 };
 
 var textToTagClose = {
   test: /^<\//,
-  token: 'tag close',
+  state: 'tag close',
   value: /^<\/([^>]+)>/
 };
 
 var tagCloseToTagClose = textToTagClose;
 
+var tagCloseToTagOpen = noneToTagOpen;
+
 var tagCloseToTag = {
   test: /^<[^>]+\/>/,
-  token: 'tag',
+  state: 'tag',
   value: /^<([^>]+)\/>/
 };
 
@@ -86,50 +90,58 @@ var attributeValueToText = attributeNameToText;
 
 var tagOpenToText = {
   test: /^>[^<]/,
-  token: 'text',
+  state: 'text',
   value: /^>([^<]+)/
 };
 
 var scriptTagOpenToScriptTagClose = {
   test: /^><\/script>/,
   token: 'tag close',
+  state: 'script tag close',
   value: /^><\/(script)>/
 };
 
 var scriptTagOpenToText = {
   test: /^>/,
-  token: 'text',
+  state: 'text',
   value: /^>(.*)(<\/script>)/
 };
 
 function HTMLTokenizer () {
   Tokenizer.apply(this, arguments);
 
-  this.addTransition('none', 'tag open', noneToTagOpen);
-  this.addTransition('none', 'script tag open', noneToScriptTagOpen);
-
-  this.addTransition('script tag open', 'text', scriptTagOpenToText);
-  this.addTransition('script tag open', 'script tag close', scriptTagOpenToScriptTagClose);
-
-  this.addTransition('tag open', 'text', tagOpenToText);
-  this.addTransition('tag open', 'tag open', tagOpenToTagOpen);
-  this.addTransition('tag open', 'attribute name', tagOpenToAttributeName);
-
-  this.addTransition('attribute name', 'text', attributeNameToText);
-  this.addTransition('attribute name', 'attribute value', attributeNameToUnquotedAttributeValue);
-  this.addTransition('attribute name', 'attribute value', attributeNameToDoubleQuotedAttributeValue);
-  this.addTransition('attribute name', 'attribute value', attributeNameToSingleQuotedAttributeValue);
-
-  this.addTransition('attribute value', 'text', attributeValueToText);
-  this.addTransition('attribute value', 'attribute name', attributeValueToAttributeName);
-  this.addTransition('attribute value', 'tag open', attributeValueToTagOpen);
-  this.addTransition('attribute value', 'tag close', attributeValueToTagClose);
-
-  this.addTransition('text', 'tag close', textToTagClose);
-
-  this.addTransition('tag close', 'tag close', tagCloseToTagClose);
-  this.addTransition('tag close', 'tag', tagCloseToTag);
+  _.each(HTMLTokenizer.transitions, function (transition) {
+    this.addTransition.apply(this, transition);
+  }, this);
 }
+
+HTMLTokenizer.transitions = [
+  [ 'none', noneToTagOpen ],
+  [ 'none', noneToScriptTagOpen ],
+
+  [ 'tag open', tagOpenToText ],
+  [ 'tag open', tagOpenToTagOpen ],
+  [ 'tag open', tagOpenToAttributeName ],
+
+  [ 'script tag open', scriptTagOpenToText ],
+  [ 'script tag open', scriptTagOpenToScriptTagClose ],
+
+  [ 'attribute name', attributeNameToText ],
+  [ 'attribute name', attributeNameToUnquotedAttributeValue ],
+  [ 'attribute name', attributeNameToDoubleQuotedAttributeValue ],
+  [ 'attribute name', attributeNameToSingleQuotedAttributeValue ],
+
+  [ 'attribute value', attributeValueToText ],
+  [ 'attribute value', attributeValueToAttributeName ],
+  [ 'attribute value', attributeValueToTagOpen ],
+  [ 'attribute value', attributeValueToTagClose ],
+
+  [ 'text', textToTagClose ],
+
+  [ 'tag close', tagCloseToTagOpen ],
+  [ 'tag close', tagCloseToTagClose ],
+  [ 'tag close', tagCloseToTag ]
+];
 
 HTMLTokenizer.prototype = Tokenizer.prototype;
 

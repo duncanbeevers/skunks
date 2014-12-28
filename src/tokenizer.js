@@ -23,7 +23,7 @@ Tokenizer.prototype = {
     this.lastToken = null;
   },
 
-  addTransition: function (from, to, transition) {
+  addTransition: function (from, transition) {
     validateTransition(transition);
     var transitions = this.transitions[from];
     if (!transitions) {
@@ -58,7 +58,7 @@ Tokenizer.prototype = {
     this.str = this.str.substring(trim);
 
     var token = {
-      type: transition.token,
+      type: transition.token || transition.state,
       value: match[1]
     };
 
