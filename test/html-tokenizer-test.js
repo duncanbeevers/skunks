@@ -184,10 +184,11 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'object' }
   ]);
 
-  // writeTokenizationTest('<ng:include src="x"></ng:include>', [
-  // ]);
-    // equal(minify('<ng-include src="\'views/partial-notification.html\'"></ng-include><div ng-view=""></div>'),
-    //   '<ng-include src="\'views/partial-notification.html\'"></ng-include><div ng-view=""></div>'
-    // );
+  writeTokenizationTest('<some-tag-1></some-tag-1><some-tag-2></some-tag-2>', [
+    { type: 'tag open', value: 'some-tag-1' },
+    { type: 'tag close', value: 'some-tag-1' },
+    { type: 'tag open', value: 'some-tag-2' },
+    { type: 'tag close', value: 'some-tag-2' }
+  ]);
 
 });

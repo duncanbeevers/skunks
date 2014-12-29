@@ -44,10 +44,12 @@ var attributeValueToAttributeName = {
   value: /^\s*([a-z\-]+)>?/
 };
 
-var attributeValueToTagClose = {
+var tagOpenToTagClose = {
   state: 'tag close',
   value: /^<\/([^\s>]+)\s*>/
 };
+
+var attributeValueToTagClose = tagOpenToTagClose;
 
 var attributeValueToTagOpen = {
   state: 'tag open',
@@ -106,6 +108,7 @@ HTMLTokenizer.transitions = [
 
   [ 'tag open', tagOpenToText ],
   [ 'tag open', tagOpenToTagOpen ],
+  [ 'tag open', tagOpenToTagClose ],
   [ 'tag open', tagOpenToAttributeName ],
 
   [ 'script tag open', scriptTagOpenToText ],

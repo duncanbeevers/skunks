@@ -1,9 +1,13 @@
 'use strict';
 
+var verbose = false;
+
 // Transform string of markup into array of tokens
 
 var _ = require('lodash');
 
+// Transitions must be well-formed.
+// Validation is primarily for programmer-happiness.
 function validateTransition (transition) {
   if (!transition) {
     throw new Error('Transition must be an object providing a `state` string and a `value` regular expression');
@@ -65,9 +69,11 @@ Tokenizer.prototype = {
     var trim = match[0].length - ((match[2] && match[2].length) || 0);
     this.lastStem = this.str.substring(0, trim);
 
-    // console.log('\nTransition: `' + this.state + '` ➡ `' + transition.state + '`');
-    // console.log('  ' + JSON.stringify(this.str) + ' matches ' + transition.value.toString() + ' ' + JSON.stringify(match));
-    // console.log('  ' + Array(JSON.stringify(this.lastStem).length).join(' ') + '↑');
+    if (verbose) {
+      console.log('\nTransition: `' + this.state + '` ➡ `' + transition.state + '`');
+      console.log('  ' + JSON.stringify(this.str) + ' matches ' + transition.value.toString() + ' ' + JSON.stringify(match));
+      console.log('  ' + Array(JSON.stringify(this.lastStem).length).join(' ') + '↑');
+    }
 
     this.state = transition.state;
     this.str = this.str.substring(trim);
@@ -95,8 +101,8 @@ Tokenizer.prototype = {
 
       tokens.push(token);
     }
-    return tokens;
 
+    return tokens;
   }
 };
 
