@@ -67,6 +67,8 @@ var attributeNameToText = {
   not: />$/
 };
 
+var textToTagOpen = attributeValueToTagOpen;
+
 var textToTagClose = {
   state: 'tag close',
   value: /^<\/([^>]+)>/
@@ -130,6 +132,7 @@ HTMLTokenizer.transitions = [
   [ 'attribute value', attributeValueToTagOpen ],
   [ 'attribute value', attributeValueToTagClose ],
 
+  [ 'text', textToTagOpen ],
   [ 'text', textToTagClose ],
 
   [ 'tag close', tagCloseToTagOpen ],

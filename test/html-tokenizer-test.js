@@ -196,4 +196,23 @@ describe('HTMLTokenizer', function () {
     { type: 'text', value: '[\']["]' }
   ]);
 
+  writeTokenizationTest('<a href="test.html"><div>hey</div></a>', [
+    { type: 'tag open', value: 'a' },
+    { type: 'attribute name', value: 'href' },
+    { type: 'attribute value', value: 'test.html' },
+    { type: 'tag open', value: 'div' },
+    { type: 'text', value: 'hey' },
+    { type: 'tag close', value: 'div' },
+    { type: 'tag close', value: 'a' }
+  ]);
+
+  writeTokenizationTest(':) <a href="http://example.com">link</a>', [
+    { type: 'text', value: ':) ' },
+    { type: 'tag open', value: 'a' },
+    { type: 'attribute name', value: 'href' },
+    { type: 'attribute value', value: 'http://example.com' },
+    { type: 'text', value: 'link' },
+    { type: 'tag close', value: 'a' }
+  ]);
+
 });
