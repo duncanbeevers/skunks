@@ -24,6 +24,7 @@ function validateTransition (transition) {
 
 function Tokenizer () {
   this.transitions = {};
+  this.transitionIds = {};
   this.resetState();
 }
 
@@ -35,11 +36,35 @@ Tokenizer.prototype = {
 
   addTransition: function (from, transition) {
     validateTransition(transition);
+
+    if (!transition.id) {
+      transition.id = [
+        transition.value.toString(),
+        transition.state,
+        transition.token || '',
+        transition.not ? transition.not.toString() : ''
+      ].join(':');
+    }
+
+    if (this.transitionIds[transition.id] && this.transitionIds[transition.id] !== transition) {
+      throw new Error('Failed to add transition from `' + from + '` to `' + transition.state + '` identical transition already exists ' + JSON.stringify(this.transitionIds[transition.id]));
+    }
+
+    if (!transition.from) {
+      transition.from = [];
+    }
+
+    transition.from.push(from);
+
+    this.transitionIds[transition.id] = transition;
+
     var transitions = this.transitions[from];
     if (!transitions) {
       transitions = [];
       this.transitions[from] = transitions;
     }
+
+    transition.valueString = transition.value.toString();
 
     transitions.unshift(transition);
   },

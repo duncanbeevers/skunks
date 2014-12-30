@@ -19,10 +19,7 @@ var noneToText = {
   value: /^([^<]+)/
 };
 
-var tagOpenToTagOpen = {
-  state: 'tag open',
-  value: /^<([^\s>]+)>?/
-};
+var tagOpenToTagOpen = noneToTagOpen;
 
 var tagOpenToAttributeName = {
   state: 'attribute name',
@@ -56,10 +53,7 @@ var tagOpenToTagClose = {
 
 var attributeValueToTagClose = tagOpenToTagClose;
 
-var attributeValueToTagOpen = {
-  state: 'tag open',
-  value: /^<([^\s>]+)>?/
-};
+var attributeValueToTagOpen = noneToTagOpen;
 
 var attributeNameToText = {
   state: 'text',
@@ -87,10 +81,7 @@ var tagCloseToTag = {
 
 var attributeValueToText = attributeNameToText;
 
-var tagOpenToText = {
-  state: 'text',
-  value: /^([^<]+)/
-};
+var tagOpenToText = noneToText;
 
 var scriptTagOpenToScriptTagClose = {
   token: 'tag close',
