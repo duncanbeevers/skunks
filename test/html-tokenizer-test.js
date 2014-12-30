@@ -215,4 +215,17 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'a' }
   ]);
 
+  writeTokenizationTest('<a href>ok</a>', [
+    { type: 'tag open', value: 'a' },
+    { type: 'attribute name', value: 'href' },
+    { type: 'text', value: 'ok' },
+    { type: 'tag close', value: 'a' }
+  ]);
+
+  writeTokenizationTest('<a onclick></a>', [
+    { type: 'tag open', value: 'a' },
+    { type: 'attribute name', value: 'onclick' },
+    { type: 'tag close', value: 'a' }
+  ]);
+
 });
