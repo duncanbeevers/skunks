@@ -228,4 +228,12 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'a' }
   ]);
 
+  writeTokenizationTest('<CUSTOM-TAG></CUSTOM-TAG><div>Hello :)</div>', [
+    { type: 'tag open', value: 'CUSTOM-TAG' },
+    { type: 'tag close', value: 'CUSTOM-TAG' },
+    { type: 'tag open', value: 'div' },
+    { type: 'text', value: 'Hello :)' },
+    { type: 'tag close', value: 'div' }
+  ]);
+
 });
