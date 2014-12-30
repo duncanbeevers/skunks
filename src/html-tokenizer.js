@@ -14,6 +14,11 @@ var noneToTagOpen = {
   value: /^<([^\s>]+)>?/
 };
 
+var noneToText = {
+  state: 'text',
+  value: /^([^<]+)/
+};
+
 var tagOpenToTagOpen = {
   state: 'tag open',
   value: /^<([^\s>]+)>?/
@@ -105,6 +110,7 @@ function HTMLTokenizer () {
 HTMLTokenizer.transitions = [
   [ 'none', noneToTagOpen ],
   [ 'none', noneToScriptTagOpen ],
+  [ 'none', noneToText ],
 
   [ 'tag open', tagOpenToText ],
   [ 'tag open', tagOpenToTagOpen ],

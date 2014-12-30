@@ -191,4 +191,9 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'some-tag-2' }
   ]);
 
+
+  writeTokenizationTest('[\']["]', [
+    { type: 'text', value: '[\']["]' }
+  ]);
+
 });
