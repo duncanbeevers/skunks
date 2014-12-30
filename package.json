@@ -4,7 +4,7 @@
   "description": "Tokenize, parse, groom, and emit html",
   "main": "index.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "./node_modules/.bin/mocha test"
   },
   "author": "Duncan Beevers",
   "license": "WTFPL",
