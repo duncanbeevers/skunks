@@ -242,4 +242,8 @@ describe('HTMLTokenizer', function () {
     { type: 'tag close', value: 'html' },
     { type: 'text', value: '\n' }
   ]);
+
+  writeTokenizationTest('</html>', [
+    { type: 'tag close', value: 'html' }
+  ]);
 });
