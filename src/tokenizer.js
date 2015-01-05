@@ -101,7 +101,7 @@ Tokenizer.prototype = {
       console.log('  ' + Array(JSON.stringify(this.lastStem).length).join(' ') + '↑');
     }
 
-    if (!options.final && this.str.substring(trim) === '') {
+    if (options && options.eager && this.str.substring(trim) === '') {
       // Token was recognized, but we may not actually be at the end of the stream.
       // '<a>Click he', 're</a>'
       return cb(null, null);
@@ -136,12 +136,12 @@ Tokenizer.prototype = {
     }
 
     while (true) {
-      if (!this.nextToken(onNextToken, { final: false })) {
+      if (!this.nextToken(onNextToken, { eager: true })) {
         break;
       }
     }
 
-    this.nextToken(onNextToken, { final: true });
+    this.nextToken(onNextToken);
 
     return tokens;
   },

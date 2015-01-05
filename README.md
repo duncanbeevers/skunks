@@ -80,3 +80,47 @@ tokenizer.processSync('<p>The quick brown fox</p>');
 //     value: 'The quick brown fox' },
 //   { type: 'tag close', value: 'p' } ]
 ```
+
+## Asynchronous operation
+
+The tokenizer can be used in an asynchronous fashion, although it is still a stateful instance and so care must be taken not to use a single tokenizer instance to process multiple inputs simultaneously.
+
+To use the instance asynchronously, first append data to the instance.
+
+```javascript
+tokenizer.push('<html></html>');
+```
+
+Then read tokens out, one-by-one.
+
+```javascript
+tokenizer.nextToken(function (err, token) {
+  if (err) {
+    throw err;
+  }
+
+  if (token) {
+    console.log('Congratulations, you got a token');
+    console.log(JSON.stringify(token));
+  }
+});
+```
+
+Unconsumed tokens remain in the instance, and can be appended to. If the tokenizer is being operated in a mode where not all input is yet available, the `eager` option can be supplied which will prevent the tokenizer from throwing errors or consuming a final, incomplete token.
+
+## Streaming API
+
+Rather than setting up the async interaction with the tokenzier manually, it can be operated as a transform stream. The input to the stream is a string stream and the output is an stream of token objects.
+
+See the html2tokens.js demo for an example of setting up and using the tokenizer stream.
+
+```
+❯ echo '<html></html>' | node ./demo/html2tokens.js
+[
+{"type":"tag open","value":"html"}
+,
+{"type":"tag close","value":"html"}
+,
+{"type":"text","value":"\n"}
+]
+```

@@ -13,7 +13,7 @@ function createTokenizerTransformStream (tokenizer) {
     }
 
     while (true) {
-      if (!tokenizer.nextToken(onNextToken, { final: false })) {
+      if (!tokenizer.nextToken(onNextToken, { eager: true })) {
         break;
       }
     }
@@ -33,7 +33,7 @@ function createTokenizerTransformStream (tokenizer) {
     }
 
     while (true) {
-      if (!tokenizer.nextToken(onNextToken, { final: true })) {
+      if (!tokenizer.nextToken(onNextToken)) {
         break;
       }
     }
