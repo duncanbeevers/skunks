@@ -32,6 +32,7 @@ function Tokenizer () {
 Tokenizer.prototype = {
   resetState: function () {
     this.state = 'none';
+    this.lastStem = '';
     this.str = '';
   },
 
@@ -79,7 +80,7 @@ Tokenizer.prototype = {
 
     var transition = _.find(this.transitions[this.state], function (transition) {
       var lastStemMatches = !transition.not || !this.lastStem ||
-        transition.not.test(this.lastStem);
+        !transition.not.test(this.lastStem);
 
       return lastStemMatches && transition.value.test(this.str);
     }, this);

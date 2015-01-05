@@ -5,7 +5,7 @@ var Tokenizer = require('./tokenizer');
 
 var noneToTagOpen = {
   state: 'tag open',
-  value: /^<([^\s>]+)>?/
+  value: /^<([^\s>]+)\s*>?/
 };
 
 var noneToScriptTagOpen = {
@@ -32,7 +32,8 @@ var tagOpenToTagClose = noneToTagClose;
 
 var tagOpenToAttributeName = {
   state: 'attribute name',
-  value: /^\s+([a-zA-Z_:][a-zA-Z0-9_:\.\-]*)>?/
+  value: /^([a-zA-Z_:][a-zA-Z0-9_:\.\-]*)>?/,
+  not: />$/
 };
 
 var scriptTagOpenToText = {
@@ -48,31 +49,27 @@ var scriptTagOpenToScriptTagClose = {
 
 var attributeNameToText = {
   state: 'text',
-  value: /^([^<]+)/,
-  not: />$/
+  value: /^([^<]+)/
 };
 
 var attributeNameToUnquotedAttributeValue = {
   state: 'attribute value',
-  value: /^=([^>\s]+)>?/
+  value: /^=([^>\s]+)\s*>?/
 };
 
 var attributeNameToDoubleQuotedAttributeValue = {
   state: 'attribute value',
-  value: /^="([^"]*)"+>?/
+  value: /^="([^"]*)"+\s*>?/
 };
 
 var attributeNameToSingleQuotedAttributeValue = {
   state: 'attribute value',
-  value: /^='([^']*)'+>?/
+  value: /^='([^']*)'+\s*>?/
 };
 
 var attributeNameToTagClose = noneToTagClose;
 
-var attributeValueToAttributeName = {
-  state: 'attribute name',
-  value: /^\s*([a-z\-]+)>?/
-};
+var attributeValueToAttributeName = tagOpenToAttributeName;
 
 var attributeValueToText = attributeNameToText;
 
@@ -123,8 +120,8 @@ HTMLTokenizer.transitions = [
   ['attribute name', attributeNameToSingleQuotedAttributeValue],
   ['attribute name', attributeNameToTagClose],
 
-  ['attribute value', attributeValueToAttributeName],
   ['attribute value', attributeValueToText],
+  ['attribute value', attributeValueToAttributeName],
   ['attribute value', attributeValueToTagOpen],
   ['attribute value', attributeValueToTagClose],
 
