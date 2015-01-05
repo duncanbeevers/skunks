@@ -111,7 +111,7 @@ Matched tokens are removed from the beginning of the tokenizer's input buffer, a
 
 ## Streaming API
 
-Rather than setting up the async interaction with the tokenzier manually, it can be operated as a transform stream. The input to the stream is a string stream and the output is an stream of token objects.
+Rather than setting up the async interaction with the tokenzier manually, it can be operated as a transform stream. The input to the stream is a string stream and the output is a stream of token objects.
 
 See the html2tokens.js demo for an example of setting up and using the tokenizer stream.
 
