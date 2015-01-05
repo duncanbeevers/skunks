@@ -102,11 +102,12 @@ tokenizer.nextToken(function (err, token) {
   if (token) {
     console.log('Congratulations, you got a token');
     console.log(JSON.stringify(token));
+    // { type: 'tag open', value: 'html' }
   }
 });
 ```
 
-Unconsumed tokens remain in the instance, and can be appended to. If the tokenizer is being operated in a mode where not all input is yet available, the `eager` option can be supplied which will prevent the tokenizer from throwing errors or consuming a final, incomplete token.
+Matched tokens are removed from the beginning of the tokenizer's input buffer, and the input buffer can be appended to between token consumption calls. If tokens are being consumed when all input may not yet be available, the `eager` option can be supplied which prevents consumption of the final token. Instead a `null` token is provided to the callback, and should be ignored. To ensure the final token is consumed when the end of input is reached, a `nextToken` call should be made omitting the `eager` option.
 
 ## Streaming API
 
@@ -115,12 +116,10 @@ Rather than setting up the async interaction with the tokenzier manually, it can
 See the html2tokens.js demo for an example of setting up and using the tokenizer stream.
 
 ```
-❯ echo '<html></html>' | node ./demo/html2tokens.js
+❯ echo -n '<html></html>' | node ./demo/html2tokens.js
 [
 {"type":"tag open","value":"html"}
 ,
 {"type":"tag close","value":"html"}
-,
-{"type":"text","value":"\n"}
 ]
 ```
