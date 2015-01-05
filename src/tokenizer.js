@@ -1,6 +1,7 @@
 'use strict';
 
 var verbose = false;
+var enforceTransitionObjectIdentity = false;
 
 // Transform string of markup into array of tokens
 
@@ -31,23 +32,27 @@ function Tokenizer () {
 Tokenizer.prototype = {
   resetState: function () {
     this.state = 'none';
-    this.lastToken = null;
+    this.str = '';
   },
 
   addTransition: function (from, transition) {
     validateTransition(transition);
 
-    if (!transition.id) {
-      transition.id = [
-        transition.value.toString(),
-        transition.state,
-        transition.token || '',
-        transition.not ? transition.not.toString() : ''
-      ].join(':');
-    }
+    if (enforceTransitionObjectIdentity) {
+      if (!transition.id) {
+        transition.id = [
+          transition.value.toString(),
+          transition.state,
+          transition.token || '',
+          transition.not ? transition.not.toString() : ''
+        ].join(':');
+      }
 
-    if (this.transitionIds[transition.id] && this.transitionIds[transition.id] !== transition) {
-      throw new Error('Failed to add transition from `' + from + '` to `' + transition.state + '` identical transition already exists ' + JSON.stringify(this.transitionIds[transition.id]));
+      if (this.transitionIds[transition.id] && this.transitionIds[transition.id] !== transition) {
+        throw new Error('Failed to add transition from `' + from + '` to `' + transition.state + '` identical transition already exists ' + JSON.stringify(this.transitionIds[transition.id]));
+      }
+
+      this.transitionIds[transition.id] = transition;
     }
 
     if (!transition.from) {
@@ -55,8 +60,6 @@ Tokenizer.prototype = {
     }
 
     transition.from.push(from);
-
-    this.transitionIds[transition.id] = transition;
 
     var transitions = this.transitions[from];
     if (!transitions) {
@@ -69,10 +72,9 @@ Tokenizer.prototype = {
     transitions.unshift(transition);
   },
 
-  nextToken: function () {
+  nextToken: function (cb, options) {
     if (this.str === '') {
-      this.resetState();
-      return null;
+      return cb(null, null);
     }
 
     var transition = _.find(this.transitions[this.state], function (transition) {
@@ -83,16 +85,15 @@ Tokenizer.prototype = {
     }, this);
 
     if (!transition) {
-      throw new Error('No transition found from `' + this.state + '` for ' + JSON.stringify(this.str));
+      return cb(new Error('No transition found from `' + this.state + '` for ' + JSON.stringify(this.str)));
     }
 
     var match = this.str.match(transition.value);
     if (!match) {
-      throw new Error('Transition from `' + this.state + '` to `' + transition.state + '` failed to match ' + transition.value.toString() + ' against ' + JSON.stringify(this.str));
+      return cb(new Error('Transition from `' + this.state + '` to `' + transition.state + '` failed to match ' + transition.value.toString() + ' against ' + JSON.stringify(this.str)));
     }
 
     var trim = match[0].length - ((match[2] && match[2].length) || 0);
-    this.lastStem = this.str.substring(0, trim);
 
     if (verbose) {
       console.log('\nTransition: `' + this.state + '` ➡ `' + transition.state + '`');
@@ -100,7 +101,14 @@ Tokenizer.prototype = {
       console.log('  ' + Array(JSON.stringify(this.lastStem).length).join(' ') + '↑');
     }
 
+    if (!options.final && this.str.substring(trim) === '') {
+      // Token was recognized, but we may not actually be at the end of the stream.
+      // '<a>Click he', 're</a>'
+      return cb(null, null);
+    }
+
     this.state = transition.state;
+    this.lastStem = this.str.substring(0, trim);
     this.str = this.str.substring(trim);
 
     var token = {
@@ -108,27 +116,40 @@ Tokenizer.prototype = {
       value: match[1]
     };
 
-    this.lastToken = token;
-
-    return token;
+    return cb(null, token);
   },
 
-  process: function (str) {
+  processSync: function (str) {
     this.resetState();
     this.str = str;
 
     var tokens = [];
-    while (true) {
-      var token = this.nextToken();
-      if (!token) {
-        break;
+
+    function onNextToken (err, token) {
+      if (err) {
+        throw err;
       }
 
-      tokens.push(token);
+      if (token) {
+        return tokens.push(token);
+      }
     }
 
+    while (true) {
+      if (!this.nextToken(onNextToken, { final: false })) {
+        break;
+      }
+    }
+
+    this.nextToken(onNextToken, { final: true });
+
     return tokens;
+  },
+
+  push: function (str) {
+    this.str += str;
   }
+
 };
 
 module.exports = Tokenizer;

@@ -7,7 +7,7 @@ function writeTokenizationTest (markup, expectedTokens) {
   describe('processing ' + JSON.stringify(markup), (function (markup, expectedTokens) {
     return function () {
       before(function () {
-        this.tokens = this.tokenizer.process(markup);
+        this.tokens = this.tokenizer.processSync(markup);
       });
 
       it('should produce ' + expectedTokens.length + ' tokens', function () {

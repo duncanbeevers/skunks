@@ -23,5 +23,4 @@ AngularTokenizer.transitions = [
 
 AngularTokenizer.prototype = HTMLTokenizer.prototype;
 
-
 module.exports = AngularTokenizer;

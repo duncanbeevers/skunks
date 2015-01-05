@@ -42,7 +42,7 @@ Before processing, the machine begins in the `none` state.
 Attempting to run the machine before any transition rules have been added results in an error message.
 
 ```javascript
-tokenizer.process('<p>The quick brown fox</p>');
+tokenizer.processSync('<p>The quick brown fox</p>');
 // Error: No transition found from `none` for "<p>The quick brown fox</p>"
 ```
 
@@ -54,7 +54,7 @@ tokenizer.addTransition('none', {
   value: /^<([^>]+)>/
 });
 
-tokenizer.process('<p>The quick brown fox</p>');
+tokenizer.processSync('<p>The quick brown fox</p>');
 // Error: No transition found from `tag open` for "The quick brown fox</p>"
 ```
 
@@ -66,7 +66,7 @@ tokenizer.addTransition('tag open', {
   value: /^([^<]+)/
 });
 
-tokenizer.process('<p>The quick brown fox</p>');
+tokenizer.processSync('<p>The quick brown fox</p>');
 // Error: No transition found from `text` for "</p>"
 
 tokenizer.addTransition('text', {
@@ -74,7 +74,7 @@ tokenizer.addTransition('text', {
   value: /^<\/([^>]+)>/
 });
 
-tokenizer.process('<p>The quick brown fox</p>');
+tokenizer.processSync('<p>The quick brown fox</p>');
 // [ { type: 'tag open', value: 'p' },
 //   { type: 'text',
 //     value: 'The quick brown fox' },

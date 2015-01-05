@@ -56,12 +56,12 @@ describe('Tokenizer', function () {
 
     it('should throw when unable to transition', function () {
       expect(_.bind(function () {
-        this.tokenizer.process('foo');
+        this.tokenizer.processSync('foo');
       }, this)).to.throwException(/No transition found/);
     });
 
     it('should recognize transition to valid state', function () {
-      var tokens = this.tokenizer.process('<bar>');
+      var tokens = this.tokenizer.processSync('<bar>');
       expect(tokens.length).to.equal(1);
       var token = tokens[0];
       expect(token.value).to.equal('bar');
@@ -69,7 +69,7 @@ describe('Tokenizer', function () {
     });
 
     it('should recognize subsequent transition to valid state', function () {
-      var tokens = this.tokenizer.process('<bar></bar>');
+      var tokens = this.tokenizer.processSync('<bar></bar>');
       expect(tokens.length).to.equal(2);
       var token = tokens[1];
       expect(token.value).to.equal('bar');
